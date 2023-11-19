@@ -10,6 +10,7 @@ resource "tls_private_key" "rsa-4096" {
 resource "aws_security_group" "sg_ec2" {
   name        = "sg_ec2"
   description = "Security group for allow SSH and HTTP in EC2"
+
   ingress {
     from_port   = 22
     to_port     = 22
@@ -20,6 +21,22 @@ resource "aws_security_group" "sg_ec2" {
   ingress {
     from_port   = 3000
     to_port     = 3000
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # Jenkins port
+  ingress {
+    from_port   = 8080
+    to_port     = 8080
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # Sonarqube port
+  ingress {
+    from_port   = 9000
+    to_port     = 9000
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }

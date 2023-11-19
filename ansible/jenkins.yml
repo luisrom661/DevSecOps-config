@@ -1,0 +1,60 @@
+---
+- name: Install Jenkins on Ubuntu Server
+- hosts: ubuntu
+  become: yes
+
+  tasks:
+    - name: Actualizar la lista de paquetes
+      apt:
+        update_cache: yes
+
+    - name: Instalar OpenJDK 17
+      apt:
+        name: openjdk-17-jdk
+        state: present
+
+    - name: Instalar dependencias libc6-x32 y libc6-i386
+      apt:
+        name:
+          - libc6-x32
+          - libc6-i386
+        state: present
+
+    - name: Descargar e instalar JDK 17 desde Oracle
+      get_url:
+        url: "https://download.oracle.com/java/17/latest/jdk-17_linux-x64_bin.deb"
+        dest: "/tmp/jdk-17_linux-x64_bin.deb"
+
+    - name: Instalar JDK 17 desde el paquete descargado
+      apt:
+        deb: "/tmp/jdk-17_linux-x64_bin.deb"
+        state: present
+
+    - name: Añadir la clave de Jenkins
+      apt_key:
+        url: "https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key"
+        state: present
+
+    - name: Añadir el repositorio de Jenkins
+      apt_repository:
+        repo: "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/"
+        state: present
+
+    - name: Actualizar la lista de paquetes después de añadir el repositorio
+      apt:
+        update_cache: yes
+
+    - name: Instalar Jenkins
+      apt:
+        name: jenkins
+        state: present
+
+    - name: Iniciar el servicio Jenkins
+      systemd:
+        name: jenkins
+        state: started
+
+    - name: Verificar el estado de Jenkins
+      systemd:
+        name: jenkins
+        state: status
