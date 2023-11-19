@@ -1,6 +1,6 @@
 ---
 - name: Install Trivy on Ubuntu Server
-- hosts: ubuntu
+  hosts: ubuntu
   become: yes
 
   tasks:
@@ -18,14 +18,27 @@
         url: "https://aquasecurity.github.io/trivy-repo/deb/public.key"
         dest: "/tmp/trivy-public.key"
 
-    - name: Añadir la clave a keyring
-      command: "gpg --dearmor /tmp/trivy-public.key > /usr/share/keyrings/trivy.gpg"
+    - name: Desarmar la clave
+      command: 
+        cmd: gpg --dearmor --output /tmp/trivy-public.gpg /tmp/trivy-public.key
       become: yes
+
+    - name: Mover la clave a keyring
+      copy: 
+        src: /tmp/trivy-public.gpg
+        dest: /usr/share/keyrings/trivy.gpg
+        remote_src: yes
+      become: yes
+
+    - name: Obtener la versión de la distribución
+      command: lsb_release -sc
+      register: distro_version
+      changed_when: false
 
     - name: Añadir el repositorio de Trivy
       lineinfile:
         path: "/etc/apt/sources.list.d/trivy.list"
-        line: "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main"
+        line: "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb {{ distro_version.stdout }} main"
         create: yes
 
     - name: Actualizar la lista de paquetes después de añadir el repositorio

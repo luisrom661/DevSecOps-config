@@ -30,7 +30,7 @@ Automatización completa para una configuración segura de DevSecOps en AWS. Uti
    2. Establece una contraseña para el usuario `admin`, la cual se encuentra en el archivo `jenkins/secrets/initialAdminPassword` o usa el comando `sudo cat /var/lib/jenkins/secrets/initialAdminPassword`.
 
 4. Sonarqube
-   1. Ejecuta el comando `docker run -d --name sonar -p 9000:9000 sonarqube:lts-community` para crear el contenedor de Sonarqube en el puerto 9000.
+   1. Ejecuta el comando `sudo chmod 777 /var/run/docker.sock` y luego `docker run -d --name sonar -p 9000:9000 sonarqube:lts-community` para crear el contenedor de Sonarqube en el puerto 9000.
    2. Entra al servidor de Sonarqube a través del la IP pública de la instancia (EC2-Public-IP-Address:9000) y sigue los pasos para configurar Sonarqube.
    3. Establece una contraseña para el usuario `admin`, la cual se encuentra en el archivo `sonarqube/conf/sonar.properties` o usa el comando `sudo cat /opt/sonarqube/conf/sonar.properties`.
 

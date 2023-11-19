@@ -100,6 +100,8 @@ data "template_file" "inventory" {
   template = <<-EOT
     [ubuntu]
     ${aws_instance.public_instance.public_ip} ansible_user=ubuntu ansible_ssh_private_key_file=${path.module}/${var.aws_key_name}
+    [jenkins]
+    ${aws_instance.public_instance.public_ip}:8080 ansible_user=ubuntu ansible_ssh_private_key_file=${path.module}/${var.aws_key_name}
   EOT
 }
 
@@ -118,7 +120,15 @@ resource "null_resource" "run_ansible" {
   depends_on = [ local_file.dynamic_inventory ]
 
   provisioner "local-exec" {
-    command = "ansible-playbook -i dynamic_inventory.ini playbook.yml"
+    command     = "ansible-playbook -i dynamic_inventory.ini /home/luis/DevSecOps-Config/ansible/docker.yml"
+    working_dir = path.module
+  }
+  provisioner "local-exec" {
+    command     = "ansible-playbook -i dynamic_inventory.ini /home/luis/DevSecOps-Config/ansible/jenkins.yml"
+    working_dir = path.module
+  }
+  provisioner "local-exec" {
+    command     = "ansible-playbook -i dynamic_inventory.ini /home/luis/DevSecOps-Config/ansible/trivy.yml"
     working_dir = path.module
   }
 }

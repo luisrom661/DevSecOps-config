@@ -1,6 +1,6 @@
 ---
 - name: Install Jenkins on Ubuntu Server
-- hosts: ubuntu
+  hosts: ubuntu
   become: yes
 
   tasks:
@@ -30,15 +30,16 @@
         deb: "/tmp/jdk-17_linux-x64_bin.deb"
         state: present
 
-    - name: Añadir la clave de Jenkins
-      apt_key:
-        url: "https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key"
-        state: present
+    - name: Descargar la clave de Jenkins
+      shell: >
+        curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key | sudo tee \
+                  /usr/share/keyrings/jenkins-keyring.asc > /dev/null
 
     - name: Añadir el repositorio de Jenkins
-      apt_repository:
-        repo: "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/"
-        state: present
+      shell: >
+        echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] \
+                  https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
+                              /etc/apt/sources.list.d/jenkins.list > /dev/null
 
     - name: Actualizar la lista de paquetes después de añadir el repositorio
       apt:
@@ -55,6 +56,6 @@
         state: started
 
     - name: Verificar el estado de Jenkins
-      systemd:
-        name: jenkins
-        state: status
+      command: systemctl status jenkins
+      register: result
+      changed_when: false
