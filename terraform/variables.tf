@@ -15,19 +15,14 @@ variable "aws_region" {
 
 variable "aws_ami" {
   description = "AWS AMI"
-  default     = "ami-0fc5d935ebf8bc3bc" # Cambiar a la región que desees
+  default     = "ami-0fc5d935ebf8bc3bc" # Cambiar a la imagen que desees
 }
 
 variable "aws_instance_type" {
   description = "AWS instance type"
-  default     = "t2.micro" # Cambiar a la región que desees
+  default     = "t2.large" # Cambiar a la instancia que desees
 }
 
 variable "aws_key_name" {
   description = "AWS key name"
-}
-
-variable "aws_s3_bucket_name" {
-  description = "AWS S3 bucket name"
-  default     = "one-piece-bucket" # Cambiar a la región que desees
 }
