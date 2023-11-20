@@ -26,3 +26,34 @@ variable "aws_instance_type" {
 variable "aws_key_name" {
   description = "AWS key name"
 }
+
+variable "ingress_rules" {
+  description = "Ingress rules"
+  default = {
+    ssh = {
+      from_port = 22
+      to_port   = 22
+    },
+    app = {
+      from_port = 3000
+      to_port   = 3000
+    },
+    jenkins = {
+      from_port = 8080
+      to_port   = 8080
+    },
+    sonarqube = {
+      from_port = 9000
+      to_port   = 9000
+    }
+  }
+}
+
+variable "ansible_playbooks" {
+  description = "List of Ansible playbooks to run"
+  default = [
+    "/home/luis/Test-DevSecOps-Config/ansible/docker.yml",
+    "/home/luis/Test-DevSecOps-Config/ansible/jenkins.yml",
+    "/home/luis/Test-DevSecOps-Config/ansible/trivy.yml"
+  ]
+}
