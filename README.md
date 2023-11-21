@@ -50,5 +50,5 @@ Automatización completa para una configuración segura de DevSecOps en AWS. Uti
 4. `terraform plan` para ver el plan de ejecución.
 5. `terraform apply -auto-approve` para aplicar los cambios en AWS.
    1. Establecer el nombre de la key_pair, siempre al final el "pem": (ej, server_pem)
-6. `ssh -i "ruta del archivo pem" ubuntu@'ruta del DNS'` para conectarse a la instancia creada.
+6. `ssh -i "ruta/del/archivo/filepem" ubuntu@ec2-{ec2-public-ip}.compute-1.amazonaws.com` para conectarse a la instancia creada.
 7. `Terraform destroy` para destruir la instancia creada.
