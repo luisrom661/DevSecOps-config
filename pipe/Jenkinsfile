@@ -2,7 +2,7 @@ pipeline {
     agent any
     tools{
         jdk 'jdk17'
-        nodejs 'node18'
+        nodejs 'node16'
     }
     environment {
         SCANNER_HOME=tool 'sonar-scanner'
@@ -16,14 +16,14 @@ pipeline {
         }
         stage('Checkout from Git'){
             steps{
-                git 'https://github.com/luisrom661/app-user-backend.git'
+                git branch: 'main', credentialsId: 'credentialsID', url: 'https://github.com/luisrom661/app-user-backend.git'
             }
         }
         stage("Sonarqube Analysis "){
             steps{
                 withSonarQubeEnv('sonar-server') {
-                    sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=Game \
-                    -Dsonar.projectKey=Game '''
+                    sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=App \
+                    -Dsonar.projectKey=App '''
                 }
             }
         }
@@ -37,6 +37,38 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 sh "npm install"
+            }
+        }
+        stage('OWASP FS SCAN') {
+            steps {
+                dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit', odcInstallation: 'DP-Check'
+                dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+            }
+        }
+        stage('TRIVY FS SCAN') {
+            steps {
+                sh "trivy fs . > trivyfs.txt"
+            }
+        }
+        stage("Docker Build & Push"){
+            steps{
+                script{
+                   withDockerRegistry(credentialsId: 'docker', toolName: 'docker'){   
+                       sh "docker build -t app-user ."
+                       sh "docker tag app-user luisrom661/app-user:latest "
+                       sh "docker push luisrom661/app-user:latest "
+                    }
+                }
+            }
+        }
+        stage("TRIVY"){
+            steps{
+                sh "trivy image luisrom661/app-user:latest > trivy.txt" 
+            }
+        }
+        stage('Deploy to container'){
+            steps{
+                sh 'docker run -d --name app-user -p 3000:3000 luisrom661/app-user:latest'
             }
         }
     }
