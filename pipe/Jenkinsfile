@@ -2,7 +2,7 @@ pipeline {
     agent any
     tools{
         jdk 'jdk17'
-        nodejs 'node16'
+        nodejs 'node18'
     }
     environment {
         SCANNER_HOME=tool 'sonar-scanner'
@@ -12,18 +12,20 @@ pipeline {
         stage('clean workspace'){
             steps{
                 cleanWs()
+                sh 'docker stop portfolio-web || true'
+                sh 'docker rm portfolio-web || true'
             }
         }
         stage('Checkout from Git'){
             steps{
-                git branch: 'main', credentialsId: 'credentialsID', url: 'https://github.com/luisrom661/app-user-backend.git'
+                git branch: 'main', credentialsId: 'credentialsID', url: 'https://github.com/luisrom661/personal-portfolio.git'
             }
         }
         stage("Sonarqube Analysis "){
             steps{
                 withSonarQubeEnv('sonar-server') {
-                    sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=App \
-                    -Dsonar.projectKey=App '''
+                    sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=portfolio-web \
+                    -Dsonar.projectKey=portfolio-web '''
                 }
             }
         }
@@ -54,21 +56,30 @@ pipeline {
             steps{
                 script{
                    withDockerRegistry(credentialsId: 'docker', toolName: 'docker'){   
-                       sh "docker build -t app-user ."
-                       sh "docker tag app-user luisrom661/app-user:latest "
-                       sh "docker push luisrom661/app-user:latest "
+                       sh "docker build -t portfolio-web ."
+                       sh "docker tag portfolio-web luisrom661/portfolio-web:latest"
+                       sh "docker push luisrom661/portfolio-web:latest"
                     }
                 }
             }
         }
         stage("TRIVY"){
             steps{
-                sh "trivy image luisrom661/app-user:latest > trivy.txt" 
+                sh "trivy image luisrom661/portfolio-web:latest > trivy.txt" 
             }
         }
         stage('Deploy to container'){
             steps{
-                sh 'docker run -d --name app-user -p 3000:3000 luisrom661/app-user:latest'
+                sh 'docker run -d --name portfolio-web -p 3000:3000 luisrom661/portfolio-web:latest'
+            }
+        }
+        stage('Deploy to kubernets'){
+            steps{
+                script{
+                    withKubeConfig(caCertificate: '', clusterName: '', contextName: '', credentialsId: 'k8s', namespace: '', restrictKubeConfigAccess: false, serverUrl: '') {
+                       sh 'kubectl apply -f deployment.yaml'
+                  }
+                }
             }
         }
     }
