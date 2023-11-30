@@ -23,3 +23,15 @@
     - name: Docker sudo permissions
       shell: >
         sudo chmod 777 /var/run/docker.sock
+
+    - name: Install Docker container module
+      shell: >
+        ansible-galaxy collection install community.docker
+
+    - name: Install SonarQube container
+      community.docker.docker_container:
+        name: sonar
+        image: sonarqube:lts-community
+        state: started
+        ports:
+          - "9000:9000"
