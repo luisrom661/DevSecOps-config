@@ -104,6 +104,9 @@ resource "null_resource" "run_ansible" {
     working_dir = path.module
   }
   provisioner "local-exec" {
+    command = "ansible-playbook -i dynamic_inventory.ini /home/luis/DevSecOps-Config/ansible/kubernetes.yml"
+  }
+  provisioner "local-exec" {
     command     = "ansible-playbook -i dynamic_inventory.ini /home/luis/DevSecOps-Config/ansible/jenkins.yml"
     working_dir = path.module
   }
