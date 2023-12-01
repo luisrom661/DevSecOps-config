@@ -15,3 +15,18 @@ java -jar jenkins-cli.jar -s http://34.224.62.119:8080/ -auth @creds install-plu
 java -jar jenkins-cli.jar -s http://34.224.62.119:8080/ -auth @creds safe-restart
 
 /usr/lib/jvm
+
+
+adoptopenjdk
+sonar
+nodejs
+dependency-check-jenkins-plugin
+docker-plugin
+docker-commons
+docker-workflow
+docker-java-api
+docker-build-step
+kubernetes
+kubernetes-credentials
+kubernetes-client-api
+kubernetes-cli
