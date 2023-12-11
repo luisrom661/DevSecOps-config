@@ -1,5 +1,7 @@
 # DevSecOps Configuration with Terraform, Ansible and AWS
 
+![devsecops](/img/configuración_segura_de_devsecops_en_aws.png)
+
    1. [Descripción](#descripción)
    2. [Requisitos](#requisitos)
    3. [Configuración](#configuración)
